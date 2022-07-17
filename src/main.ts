@@ -1,4 +1,4 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
 
 import anki from "./anki";
 
@@ -31,21 +31,7 @@ export default class AnkiPlugin extends Plugin {
 				const activeFile = this.app.workspace.getActiveFile();
 
 				if (activeFile) {
-					const activeFileMetadata =
-						this.app.metadataCache.getFileCache(activeFile);
-
-					let ankiDeckName = getValueOfFrontmatterKey(
-						activeFileMetadata,
-						ANKI_DECK_NAME_FRONTMATTER_KEY
-					);
-
-					if (!ankiDeckName) {
-						ankiDeckName = this.settings.defaultDeckName;
-					}
-
-					const result = await anki.createDeck(ankiDeckName);
-
-					console.log(result);
+					await this.createAnkiDeck(activeFile);
 				} else {
 					new Notice(
 						"This command only works if there's an open file."
@@ -69,6 +55,24 @@ export default class AnkiPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async createAnkiDeck(activeFile: TFile) {
+		const activeFileMetadata =
+			this.app.metadataCache.getFileCache(activeFile);
+
+		let ankiDeckName = getValueOfFrontmatterKey(
+			activeFileMetadata,
+			ANKI_DECK_NAME_FRONTMATTER_KEY
+		);
+
+		if (!ankiDeckName) {
+			ankiDeckName = this.settings.defaultDeckName;
+		}
+
+		const result = await anki.createDeck(ankiDeckName);
+
+		return result;
 	}
 }
 
