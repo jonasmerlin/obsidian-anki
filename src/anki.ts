@@ -1,4 +1,4 @@
-type AnkiAction = "createDeck" | "deckNames";
+type AnkiAction = "createDeck" | "deckNames" | "addNote" | "updateNoteFields";
 
 export function createDeck(name: string) {
 	return sendAnkiCommand("createDeck", {
@@ -8,6 +8,32 @@ export function createDeck(name: string) {
 
 export function listDeckNames() {
 	return sendAnkiCommand("deckNames");
+}
+
+export function createBasicNote(front: string, back: string, deck: string) {
+	return sendAnkiCommand("addNote", {
+		note: {
+			deckName: deck,
+			modelName: "Basic",
+			fields: {
+				Front: front,
+				Back: back,
+			},
+			tags: ["obsidian"],
+		},
+	});
+}
+
+export function updateBasicNote(id: string, front: string, back: string) {
+	return sendAnkiCommand("updateNoteFields", {
+		note: {
+			id: id,
+			fields: {
+				Front: front,
+				Back: back,
+			},
+		},
+	});
 }
 
 function sendAnkiCommand(action: AnkiAction, params = {}) {
@@ -40,4 +66,4 @@ function sendAnkiCommand(action: AnkiAction, params = {}) {
 	});
 }
 
-export default { createDeck, listDeckNames };
+export default { createDeck, createNote: createBasicNote, updateBasicNote, listDeckNames };

@@ -1,4 +1,12 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
+import {
+	App,
+	Editor,
+	Notice,
+	Plugin,
+	PluginSettingTab,
+	Setting,
+	TFile,
+} from "obsidian";
 
 import anki from "./anki";
 
@@ -25,13 +33,99 @@ export default class AnkiPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.addCommand({
+			id: "add-basic-anki-card",
+			name: "Add Basic Anki Card",
+			editorCallback(editor, view) {
+				const cursor = editor.getCursor();
+
+				editor.setLine(cursor.line, "```flashcard\n");
+				editor.setLine(cursor.line + 1, "{\n");
+				editor.setLine(cursor.line + 2, "    \"cardId\": null,\n");
+				editor.setLine(cursor.line + 3, "    \"tags\": [],\n");
+				editor.setLine(cursor.line + 4, "    \"noteType\": \"Basic\"\n");
+				editor.setLine(cursor.line + 5, "}\n");
+				editor.setLine(cursor.line + 6, "Front\n");
+				editor.setLine(cursor.line + 7, "Back\n");
+				editor.setLine(cursor.line + 8, "```");
+			},
+		});
+
+		this.addCommand({
 			id: "create-anki-cards",
 			name: "Create Anki Cards",
-			callback: async () => {
+			editorCallback: async (editor: Editor) => {
 				const activeFile = this.app.workspace.getActiveFile();
 
 				if (activeFile) {
-					await this.createAnkiDeck(activeFile);
+					const deckName = await this.createAnkiDeck(activeFile);
+
+					const activeFileMetadata =
+						this.app.metadataCache.getFileCache(activeFile);
+
+					if (activeFileMetadata && activeFileMetadata.sections) {
+						const contents = await this.app.vault.read(activeFile);
+
+						console.log(contents);
+						console.log(activeFileMetadata.sections);
+
+						const sections = activeFileMetadata.sections.filter(
+							(section) => {
+								return section.type === "code";
+							}
+						);
+
+						for (const section of sections) {
+							const blockStartLine = section.position.start.line;
+
+							console.log(section);
+
+							const line = editor.getLine(blockStartLine);
+
+							const isFlashcardBlock =
+								line.search(/(F|f)lashcard\s*$/) > -1;
+
+							if (isFlashcardBlock) {
+								let cardMetadataString = "";
+								for (let i = 1; i <= 5; i++) {
+									cardMetadataString += editor.getLine(
+										blockStartLine + i
+									);
+								}
+
+								const cardMetadata: {
+									cardId: string | null;
+									tags: string[];
+									noteType: "Basic" | "Cloze";
+								} = JSON.parse(cardMetadataString);
+
+								const firstLine = editor.getLine(
+									blockStartLine + 6
+								);
+								const secondLine = editor.getLine(
+									blockStartLine + 7
+								);
+
+								if (cardMetadata.cardId) {
+									await anki.updateBasicNote(
+										cardMetadata.cardId,
+										firstLine,
+										secondLine
+									);
+								} else {
+									const noteId = await anki.createNote(
+										firstLine,
+										secondLine,
+										deckName
+									);
+
+									editor.setLine(
+										blockStartLine + 2,
+										`    "cardId": ${noteId},`
+									);
+								}
+							}
+						}
+					}
 				} else {
 					new Notice(
 						"This command only works if there's an open file."
@@ -57,7 +151,7 @@ export default class AnkiPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	async createAnkiDeck(activeFile: TFile) {
+	async createAnkiDeck(activeFile: TFile): Promise<string> {
 		const activeFileMetadata =
 			this.app.metadataCache.getFileCache(activeFile);
 
@@ -70,9 +164,9 @@ export default class AnkiPlugin extends Plugin {
 			ankiDeckName = this.settings.defaultDeckName;
 		}
 
-		const result = await anki.createDeck(ankiDeckName);
+		await anki.createDeck(ankiDeckName);
 
-		return result;
+		return ankiDeckName;
 	}
 }
 
