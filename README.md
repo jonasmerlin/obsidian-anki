@@ -1,73 +1,77 @@
-# Obsidian Sample Plugin
+# Obsidian Anki
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Another plugin to create Anki cards from Obsidian. This one is highly opinionated and mostly exists because the existing ones weren't maintained and started to fall apart on me. So here's one I can maintain myself. If it fits your workflow - or you're open to changing your workflow to fit it - , you're very welcome to use it and improve it with me. Otherwise, I can't promise anything.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+# How to Install
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+First, you'll have to install the [Anki Connect](https://github.com/FooSoft/anki-connect) Anki plugin. This creates a local HTTP server that allows other programs to essentially "remote control" Anki.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+To install Anki Connect ...
 
-## First time developing plugins?
+* Open Anki
+* Select **Tools -> Add-ons** from the menu bar
+* Click **Get Add-ons**
+* Paste 2055492159
+* Press **Ok**
+* Restart Anki
 
-Quick starting guide for new plugin devs:
+Then you will have to install Obsidian Anki like you would any other Obsidian community plugin.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+Once installed and enabled, go ahead and check the settings. Right now, there is only one: the name of the default deck. This setting defaults to, well ... "Default". If that's okay for you, you're ready to create cards. Otherwise change it to your liking.
 
-## Releasing new releases
+# How to Use
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+## Defining Cards
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+You define cards using JSON inside special `flashcard` codeblocks.
 
-## Adding your plugin to the community plugin list
+For the "Basic" Card that comes with Anki:
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+```flashcard
+{
+    "cardId": null, // Will be filled by the plugin upon card generation.
+    "tags": [tag1, tag2],
+    "noteType": "Basic",
+    "fields": {
+	    "Front": "Front Text",
+	    "Back": "Back Text"
+    }
+}
+```
 
-## How to use
+For the "Cloze" Cards that comes with Anki:
 
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+```flashcard
+{
+    "cardId": 1658266510510,
+    "tags": [],
+    "noteType": "Cloze",
+    "fields": {
+	    "Text": "Text {{c1::cloze deletion}}",
+	    "Back Extra": "Explanation"
+    }
+}
+```
 
-## Manually installing the plugin
+The advantage of this syntax is that in theory, all custom card styles should be supported. 
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+To make card definition easier, **there are two commands to add themplates for either Basic or Cloze cards** at your current cursor location:
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+1. `Add Anki Card: Basic`
+2. `Add Anki Card: Cloze`
 
+## Creating Cards
 
-## API Documentation
+Once you defined your cards, you can run the command `Create Anki Cards in Current File` to create them in Anki. **Make sure Anki is running for this**!
 
-See https://github.com/obsidianmd/obsidian-api
+In the future, I'll probably add a command to create all cards found in all files globally. But that doesn't exist yet.
+
+## Updating Cards
+
+If card creation succeeded, the `cardId` field should now be set to the Card's ID in Anki. _Don't change this!_
+
+If you want to update the card with new text, just edit the values of the fields and then run `Create Anki Cards in Current File`. Instead of creating new cards, it will update the card with the corresponding ID.
+
+## Deleting Cards
+
+Deletion is not implemented yet. It's on the roadmap though.
