@@ -40,9 +40,9 @@ export default class AnkiPlugin extends Plugin {
 
 				editor.setLine(cursor.line, "```flashcard\n");
 				editor.setLine(cursor.line + 1, "{\n");
-				editor.setLine(cursor.line + 2, "    \"cardId\": null,\n");
-				editor.setLine(cursor.line + 3, "    \"tags\": [],\n");
-				editor.setLine(cursor.line + 4, "    \"noteType\": \"Basic\"\n");
+				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
+				editor.setLine(cursor.line + 3, '    "tags": [],\n');
+				editor.setLine(cursor.line + 4, '    "noteType": "Basic"\n');
 				editor.setLine(cursor.line + 5, "}\n");
 				editor.setLine(cursor.line + 6, "Front\n");
 				editor.setLine(cursor.line + 7, "Back\n");
@@ -63,10 +63,7 @@ export default class AnkiPlugin extends Plugin {
 						this.app.metadataCache.getFileCache(activeFile);
 
 					if (activeFileMetadata && activeFileMetadata.sections) {
-						const contents = await this.app.vault.read(activeFile);
-
-						console.log(contents);
-						console.log(activeFileMetadata.sections);
+						// const contents = await this.app.vault.read(activeFile);
 
 						const sections = activeFileMetadata.sections.filter(
 							(section) => {
@@ -77,44 +74,40 @@ export default class AnkiPlugin extends Plugin {
 						for (const section of sections) {
 							const blockStartLine = section.position.start.line;
 
-							console.log(section);
-
 							const line = editor.getLine(blockStartLine);
 
 							const isFlashcardBlock =
 								line.search(/(F|f)lashcard\s*$/) > -1;
 
 							if (isFlashcardBlock) {
-								let cardMetadataString = "";
-								for (let i = 1; i <= 5; i++) {
-									cardMetadataString += editor.getLine(
-										blockStartLine + i
-									);
+								const blockLineEnd = section.position.end.line;
+
+								let cardDataString = "";
+								for (
+									let currentLine = blockStartLine + 1;
+									currentLine < blockLineEnd;
+									currentLine++
+								) {
+									cardDataString +=
+										editor.getLine(currentLine);
 								}
 
-								const cardMetadata: {
+								const cardData: {
 									cardId: string | null;
 									tags: string[];
 									noteType: "Basic" | "Cloze";
-								} = JSON.parse(cardMetadataString);
+									fields: any;
+								} = JSON.parse(cardDataString);
 
-								const firstLine = editor.getLine(
-									blockStartLine + 6
-								);
-								const secondLine = editor.getLine(
-									blockStartLine + 7
-								);
-
-								if (cardMetadata.cardId) {
+								if (cardData.cardId) {
 									await anki.updateBasicNote(
-										cardMetadata.cardId,
-										firstLine,
-										secondLine
+										cardData.cardId,
+										cardData.fields
 									);
 								} else {
-									const noteId = await anki.createNote(
-										firstLine,
-										secondLine,
+									const noteId = await anki.createBasicNote(
+										cardData.fields,
+										cardData.noteType,
 										deckName
 									);
 

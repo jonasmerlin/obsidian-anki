@@ -10,28 +10,23 @@ export function listDeckNames() {
 	return sendAnkiCommand("deckNames");
 }
 
-export function createBasicNote(front: string, back: string, deck: string) {
+export function createBasicNote(fields: any, modelname: string, deck: string) {
+	console.log(fields)
 	return sendAnkiCommand("addNote", {
 		note: {
 			deckName: deck,
-			modelName: "Basic",
-			fields: {
-				Front: front,
-				Back: back,
-			},
+			modelName: modelname,
+			fields: fields,
 			tags: ["obsidian"],
 		},
 	});
 }
 
-export function updateBasicNote(id: string, front: string, back: string) {
+export function updateBasicNote(id: string, fields: any) {
 	return sendAnkiCommand("updateNoteFields", {
 		note: {
 			id: id,
-			fields: {
-				Front: front,
-				Back: back,
-			},
+			fields: fields,
 		},
 	});
 }
@@ -66,4 +61,4 @@ function sendAnkiCommand(action: AnkiAction, params = {}) {
 	});
 }
 
-export default { createDeck, createNote: createBasicNote, updateBasicNote, listDeckNames };
+export default { createDeck, createBasicNote, updateBasicNote, listDeckNames };
