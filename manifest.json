@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-anki",
 	"name": "Obsidian Anki",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"minAppVersion": "0.12.0",
 	"description": "Another plugin that allow you to declare Anki cards inside Obsidian.",
 	"author": "Jonas Merlin Schumacher",
