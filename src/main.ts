@@ -33,8 +33,8 @@ export default class AnkiPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.addCommand({
-			id: "add-basic-anki-card",
-			name: "Add Basic Anki Card",
+			id: "add-anki-card_basic",
+			name: "Add Anki Card: Basic",
 			editorCallback(editor, view) {
 				const cursor = editor.getCursor();
 
@@ -51,8 +51,26 @@ export default class AnkiPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: "create-anki-cards",
-			name: "Create Anki Cards",
+			id: "add-anki-card_cloze",
+			name: "Add Anki Card: Cloze",
+			editorCallback(editor, view) {
+				const cursor = editor.getCursor();
+
+				editor.setLine(cursor.line, "```flashcard\n");
+				editor.setLine(cursor.line + 1, "{\n");
+				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
+				editor.setLine(cursor.line + 3, '    "tags": [],\n');
+				editor.setLine(cursor.line + 4, '    "noteType": "Cloze"\n');
+				editor.setLine(cursor.line + 5, "}\n");
+				editor.setLine(cursor.line + 6, "Tezt\n");
+				editor.setLine(cursor.line + 7, "Back Extra\n");
+				editor.setLine(cursor.line + 8, "```");
+			},
+		});
+
+		this.addCommand({
+			id: "create-anki-cards-in-current-file",
+			name: "Create Anki Cards in Current File",
 			editorCallback: async (editor: Editor) => {
 				const activeFile = this.app.workspace.getActiveFile();
 
