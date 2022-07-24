@@ -42,11 +42,13 @@ export default class AnkiPlugin extends Plugin {
 				editor.setLine(cursor.line + 1, "{\n");
 				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
 				editor.setLine(cursor.line + 3, '    "tags": [],\n');
-				editor.setLine(cursor.line + 4, '    "noteType": "Basic"\n');
-				editor.setLine(cursor.line + 5, '    "Front": "Test"\n');
-				editor.setLine(cursor.line + 6, '    "Back": "Test"\n');
-				editor.setLine(cursor.line + 7, "}\n");
-				editor.setLine(cursor.line + 8, "```");
+				editor.setLine(cursor.line + 4, '    "noteType": "Basic",\n');
+				editor.setLine(cursor.line + 5, '    "fields": "{"\n');
+				editor.setLine(cursor.line + 6, '        "Front": "Test",\n');
+				editor.setLine(cursor.line + 7, '        "Back": "Test"\n');
+				editor.setLine(cursor.line + 8, "     }\n");
+				editor.setLine(cursor.line + 9, "}\n");
+				editor.setLine(cursor.line + 10, "```");
 			},
 		});
 
@@ -60,11 +62,13 @@ export default class AnkiPlugin extends Plugin {
 				editor.setLine(cursor.line + 1, "{\n");
 				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
 				editor.setLine(cursor.line + 3, '    "tags": [],\n');
-				editor.setLine(cursor.line + 4, '    "noteType": "Cloze"\n');
-				editor.setLine(cursor.line + 5, '    "Text": "Test"\n');
-				editor.setLine(cursor.line + 6, '    "Back Extra": "Test"\n');
-				editor.setLine(cursor.line + 7, "}\n");
-				editor.setLine(cursor.line + 8, "```");
+				editor.setLine(cursor.line + 4, '    "noteType": "Cloze",\n');
+				editor.setLine(cursor.line + 5, '    "fields": "{"\n');
+				editor.setLine(cursor.line + 6, '        "Text": "Test",\n');
+				editor.setLine(cursor.line + 7, '        "Back Extra": "Test"\n');
+				editor.setLine(cursor.line + 8, "     }\n");
+				editor.setLine(cursor.line + 9, "}\n");
+				editor.setLine(cursor.line + 10, "```");
 			},
 		});
 
