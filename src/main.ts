@@ -43,9 +43,9 @@ export default class AnkiPlugin extends Plugin {
 				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
 				editor.setLine(cursor.line + 3, '    "tags": [],\n');
 				editor.setLine(cursor.line + 4, '    "noteType": "Basic"\n');
-				editor.setLine(cursor.line + 5, "}\n");
-				editor.setLine(cursor.line + 6, "Front\n");
-				editor.setLine(cursor.line + 7, "Back\n");
+				editor.setLine(cursor.line + 5, '    "Front": "Test"\n');
+				editor.setLine(cursor.line + 6, '    "Back": "Test"\n');
+				editor.setLine(cursor.line + 7, "}\n");
 				editor.setLine(cursor.line + 8, "```");
 			},
 		});
@@ -61,9 +61,9 @@ export default class AnkiPlugin extends Plugin {
 				editor.setLine(cursor.line + 2, '    "cardId": null,\n');
 				editor.setLine(cursor.line + 3, '    "tags": [],\n');
 				editor.setLine(cursor.line + 4, '    "noteType": "Cloze"\n');
-				editor.setLine(cursor.line + 5, "}\n");
-				editor.setLine(cursor.line + 6, "Tezt\n");
-				editor.setLine(cursor.line + 7, "Back Extra\n");
+				editor.setLine(cursor.line + 5, '    "Text": "Test"\n');
+				editor.setLine(cursor.line + 6, '    "Back Extra": "Test"\n');
+				editor.setLine(cursor.line + 7, "}\n");
 				editor.setLine(cursor.line + 8, "```");
 			},
 		});
