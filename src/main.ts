@@ -65,7 +65,10 @@ export default class AnkiPlugin extends Plugin {
 				editor.setLine(cursor.line + 4, '    "noteType": "Cloze",\n');
 				editor.setLine(cursor.line + 5, '    "fields": {\n');
 				editor.setLine(cursor.line + 6, '        "Text": "Test",\n');
-				editor.setLine(cursor.line + 7, '        "Back Extra": "Test"\n');
+				editor.setLine(
+					cursor.line + 7,
+					'        "Back Extra": "Test"\n'
+				);
 				editor.setLine(cursor.line + 8, "     }\n");
 				editor.setLine(cursor.line + 9, "}\n");
 				editor.setLine(cursor.line + 10, "```");
@@ -114,29 +117,51 @@ export default class AnkiPlugin extends Plugin {
 										editor.getLine(currentLine);
 								}
 
-								const cardData: {
+								let cardData: {
 									cardId: string | null;
 									tags: string[];
 									noteType: "Basic" | "Cloze";
 									fields: any;
-								} = JSON.parse(cardDataString);
+								} | null = null;
+								try {
+									cardData = JSON.parse(cardDataString);
+								} catch (e) {
+									new Notice(
+										"Flashcard JSON couldn't be parsed."
+									);
+								}
 
-								if (cardData.cardId) {
-									await anki.updateBasicNote(
-										cardData.cardId,
-										cardData.fields
-									);
-								} else {
-									const noteId = await anki.createBasicNote(
-										cardData.fields,
-										cardData.noteType,
-										deckName
-									);
+								if (cardData) {
+									if (cardData.cardId) {
+										try {
+											await anki.updateBasicNote(
+												cardData.cardId,
+												cardData.fields
+											);
+										} catch (e) {
+											new Notice(
+												`Card couldn't be updated. [cardId=${cardData.cardId}]`
+											);
+										}
+									} else {
+										try {
+											const noteId =
+												await anki.createBasicNote(
+													cardData.fields,
+													cardData.noteType,
+													deckName
+												);
 
-									editor.setLine(
-										blockStartLine + 2,
-										`    "cardId": ${noteId},`
-									);
+											editor.setLine(
+												blockStartLine + 2,
+												`    "cardId": ${noteId},`
+											);
+										} catch (e) {
+											new Notice(
+												"Card couldn't be created."
+											);
+										}
+									}
 								}
 							}
 						}
