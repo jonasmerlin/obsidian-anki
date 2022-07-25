@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-anki",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Another plugin that allow you to declare Anki cards inside Obsidian.",
 	"main": "src/main.js",
 	"scripts": {
