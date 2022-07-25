@@ -136,7 +136,8 @@ export default class AnkiPlugin extends Plugin {
 										try {
 											await anki.updateBasicNote(
 												cardData.cardId,
-												cardData.fields
+												cardData.fields,
+												cardData.tags
 											);
 										} catch (e) {
 											new Notice(
@@ -148,6 +149,7 @@ export default class AnkiPlugin extends Plugin {
 											const noteId =
 												await anki.createBasicNote(
 													cardData.fields,
+													cardData.tags,
 													cardData.noteType,
 													deckName
 												);
