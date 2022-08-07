@@ -16,10 +16,12 @@ const ANKI_DECK_NAME_FRONTMATTER_KEY = "anki-deck";
 
 interface AnkiSettings {
 	defaultDeckName: string;
+	defaultAnkiSyncPort: string;
 }
 
 const DEFAULT_SETTINGS: AnkiSettings = {
 	defaultDeckName: "Default",
+	defaultAnkiSyncPort: "8765",
 };
 
 export default class AnkiPlugin extends Plugin {
@@ -238,6 +240,21 @@ class AnkiSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.defaultDeckName)
 					.onChange(async (value) => {
 						this.plugin.settings.defaultDeckName = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Anki Sync Port")
+			.setDesc(
+				"The port your Anki Sync server runs on."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(this.plugin.settings.defaultAnkiSyncPort)
+					.setValue(this.plugin.settings.defaultAnkiSyncPort)
+					.onChange(async (value) => {
+						this.plugin.settings.defaultAnkiSyncPort = value;
 						await this.plugin.saveSettings();
 					})
 			);
